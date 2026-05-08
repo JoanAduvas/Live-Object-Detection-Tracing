@@ -1,3 +1,5 @@
+# Live-Object-Detection-Tracing
+
 A real-time object detection application built with *Python*, *YOLOv8*, and *Streamlit*. This app features live webcam detection, automated logging, and a *Twilio SMS alert system* that notifies you whenever a specific target object is identified.
 
 ## ✨ Features
