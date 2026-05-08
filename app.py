@@ -1,3 +1,9 @@
+import subprocess
+import sys
+try:
+    import tornado
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "tornado"])
 import os
 os.environ["STREAMLIT_WATCHER_TYPE"] = "none"
 import streamlit as st
