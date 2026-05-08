@@ -1,7 +1,7 @@
 import subprocess
 import sys
 try:
-    import tornado
+import tornado
 except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "tornado"])
 import os
