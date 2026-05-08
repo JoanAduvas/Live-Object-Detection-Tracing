@@ -1,38 +1,57 @@
-import subprocess
-import sys
-try:
-import tornado
-except ImportError:
-subprocess.check_call([sys.executable, "-m", "pip", "install", "tornado"])
 import os
 os.environ["STREAMLIT_WATCHER_TYPE"] = "none"
+
 import streamlit as st
 import av
 import cv2
 import glob
 import io
 import zipfile
+import time
 from datetime import datetime
 from ultralytics import YOLO
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, VideoProcessorBase
+from twilio.rest import Client
 
 st.set_page_config(
-    page_title="📹Live Object Detection & Tracing",
-    layout="wide"
+    page_title="📹Live Object Detection & Tracing",
+    layout="wide"
 )
 
 SAVE_DIR = "detection_logs"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 if "gallery_mode" not in st.session_state:
-    st.session_state.gallery_mode = False
+    st.session_state.gallery_mode = False
+
+# Load Twilio Credentials safely from Secrets
+TWILIO_SID = st.secrets.get("TWILIO_SID")
+TWILIO_AUTH_TOKEN = st.secrets.get("TWILIO_AUTH_TOKEN")
+TWILIO_NUMBER = st.secrets.get("TWILIO_NUMBER")
+TARGET_PHONE = st.secrets.get("TARGET_PHONE")
 
 @st.cache_resource
 def load_model():
-    return YOLO("yolov8n.pt")
+    return YOLO("yolov8n.pt")
 
 model = load_model()
 CLASS_NAMES = list(model.names.values())
+
+def send_sms_alert(obj_name):
+    """Helper function to send Twilio SMS"""
+    if not all([TWILIO_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, TARGET_PHONE]):
+        return False
+    try:
+        client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
+        client.messages.create(
+            body=f"🚨 ALERT: {obj_name.upper()} detected on Live Stream!",
+            from_=TWILIO_NUMBER,
+            to=TARGET_PHONE
+        )
+        return True
+    except Exception as e:
+        print(f"Twilio Error: {e}")
+        return False
 
 st.markdown("""
 <style>
