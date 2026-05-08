@@ -1,5 +1,5 @@
 streamlit>=1.24.0
-tornado
+tornado>=6.2
 opencv-python-headless
 ultralytics>=8.0.0
 streamlit-webrtc>=0.45.0
